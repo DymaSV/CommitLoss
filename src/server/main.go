@@ -1,21 +1,19 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 
-	"./utils"
-
-	"github.com/gorilla/mux"
+	"./handlers"
+	"github.com/gin-gonic/gin"
 	"github.com/rs/cors"
 )
 
 func main() {
-	r := mux.NewRouter()
+	r := gin.Default()
 
-	r.HandleFunc("/hello-world", helloWorld)
+	r.GET("/node", handlers.GetNodeListHandler)
 
 	// Solves Cross Origin Access Issue
 	c := cors.New(cors.Options{
@@ -29,21 +27,4 @@ func main() {
 	}
 
 	log.Fatal(srv.ListenAndServe())
-}
-
-func helloWorld(w http.ResponseWriter, r *http.Request) {
-	var data = struct {
-		Title string `json:"title"`
-	}{
-		Title: "Golang + Angular Starter Kit",
-	}
-
-	jsonBytes, err := utils.StructToJSON(data)
-	if err != nil {
-		fmt.Print(err)
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonBytes)
-	return
 }

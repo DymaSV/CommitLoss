@@ -17,20 +17,24 @@ func init() {
 
 func initialiseList() {
 	list = []Node{}
+	Add(nil, Component{
+		ID:    "1",
+		Name:  "Food",
+		Value: 200,
+	})
 }
 
 // Data of Node element
 type Component struct {
-	id    string `json:"id"`
-	name  string `json:"name"`
-	value int    `json:"value"`
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	Value int    `json:"value"`
 }
 
 // Node structur
 type Node struct {
-	parentItem *Component `json:"parentItem"`
-	item       Component  `json:"item"`
-	childItem  *Component `json:"childItem"`
+	ParentItem *Component `json:"parentItem"`
+	Item       Component  `json:"item"`
 }
 
 // Get list of nodes
@@ -39,11 +43,12 @@ func Get() []Node {
 }
 
 // Add new node
-func Add(parentItem *Component, newComponent Component, childItem *Component) {
-	t := newTodo(parentItem, newComponent, childItem)
+func Add(parentItem *Component, newItem Component) error {
+	t := newNode(parentItem, newItem)
 	mtx.Lock()
 	list = append(list, t)
 	mtx.Unlock()
+	return nil
 }
 
 // Delete Node from list
@@ -59,11 +64,10 @@ func Delete(name string) error {
 	return nil
 }
 
-func newTodo(parentItem *Component, newComponent Component, childItem *Component) Node {
+func newNode(parentItem *Component, newComponent Component) Node {
 	return Node{
-		parentItem: parentItem,
-		item:       newComponent,
-		childItem:  childItem,
+		ParentItem: parentItem,
+		Item:       newComponent,
 	}
 }
 
@@ -71,7 +75,7 @@ func findTodoLocation(name string) (int, error) {
 	mtx.RLock()
 	defer mtx.RUnlock()
 	for i, t := range list {
-		if isMatchingID(t.item.name, name) {
+		if isMatchingID(t.Item.Name, name) {
 			return i, nil
 		}
 	}
