@@ -22,7 +22,7 @@ func AddNodeHandler(c *gin.Context) {
 		c.JSON(statusCode, err)
 		return
 	}
-	errAdd := node.Add(nodeItem.ParentItem, nodeItem.Item)
+	errAdd := node.Add(nodeItem.ParentItem, nodeItem.Item, nodeItem.ChildItem)
 	if errAdd == nil {
 		c.JSON(statusCode, nodeItem)
 	} else {

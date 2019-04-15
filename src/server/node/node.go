@@ -17,11 +17,18 @@ func init() {
 
 func initialiseList() {
 	list = []Node{}
-	Add(nil, Component{
+	item := Component{
 		ID:    "1",
 		Name:  "Food",
 		Value: 200,
-	})
+	}
+	item1 := Component{
+		ID:    "2",
+		Name:  "Meet",
+		Value: 200,
+	}
+	Add(nil, item, &item1)
+	Add(&item, item1, nil)
 }
 
 // Data of Node element
@@ -35,6 +42,7 @@ type Component struct {
 type Node struct {
 	ParentItem *Component `json:"parentItem"`
 	Item       Component  `json:"item"`
+	ChildItem  *Component `json:"childItem"`
 }
 
 // Get list of nodes
@@ -43,8 +51,8 @@ func Get() []Node {
 }
 
 // Add new node
-func Add(parentItem *Component, newItem Component) error {
-	t := newNode(parentItem, newItem)
+func Add(parentItem *Component, newItem Component, childItem *Component) error {
+	t := newNode(parentItem, newItem, childItem)
 	mtx.Lock()
 	list = append(list, t)
 	mtx.Unlock()
@@ -64,10 +72,11 @@ func Delete(name string) error {
 	return nil
 }
 
-func newNode(parentItem *Component, newComponent Component) Node {
+func newNode(parentItem *Component, newComponent Component, childItem *Component) Node {
 	return Node{
 		ParentItem: parentItem,
 		Item:       newComponent,
+		ChildItem:  childItem,
 	}
 }
 
