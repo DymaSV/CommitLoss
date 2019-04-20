@@ -31,7 +31,7 @@ func initialiseList() {
 	Add(&item, item1, nil)
 }
 
-// Data of Node element
+// Component struct
 type Component struct {
 	ID    string `json:"id"`
 	Name  string `json:"name"`
