@@ -17,32 +17,24 @@ func init() {
 
 func initialiseList() {
 	list = []Node{}
-	item := Component{
-		ID:    "1",
-		Name:  "Food",
-		Value: 200,
+	item := Node{
+		ID:      0,
+		Name:    "Income",
+		Income:  212,
+		Outcome: 112,
+		Children: []Node{Node{ID: 1, Income: 0, Outcome: 20, Name: "Almond Meal flour", Children: nil},
+			Node{ID: 2, Income: 2, Outcome: 220, Name: "Protein Powder", Children: nil}},
 	}
-	item1 := Component{
-		ID:    "2",
-		Name:  "Meet",
-		Value: 200,
-	}
-	Add(nil, item, &item1)
-	Add(&item, item1, nil)
-}
-
-// Component struct
-type Component struct {
-	ID    string `json:"id"`
-	Name  string `json:"name"`
-	Value int    `json:"value"`
+	Add(item)
 }
 
 // Node structur
 type Node struct {
-	ParentItem *Component `json:"parentItem"`
-	Item       Component  `json:"item"`
-	ChildItem  *Component `json:"childItem"`
+	ID       int    `json:"id"`
+	Name     string `json:"name"`
+	Income   int    `json:"income"`
+	Outcome  int    `json:"outcome"`
+	Children []Node `json:"children"`
 }
 
 // Get list of nodes
@@ -51,10 +43,9 @@ func Get() []Node {
 }
 
 // Add new node
-func Add(parentItem *Component, newItem Component, childItem *Component) error {
-	t := newNode(parentItem, newItem, childItem)
+func Add(item Node) error {
 	mtx.Lock()
-	list = append(list, t)
+	list = append(list, item)
 	mtx.Unlock()
 	return nil
 }
@@ -72,19 +63,11 @@ func Delete(name string) error {
 	return nil
 }
 
-func newNode(parentItem *Component, newComponent Component, childItem *Component) Node {
-	return Node{
-		ParentItem: parentItem,
-		Item:       newComponent,
-		ChildItem:  childItem,
-	}
-}
-
 func findTodoLocation(name string) (int, error) {
 	mtx.RLock()
 	defer mtx.RUnlock()
 	for i, t := range list {
-		if isMatchingID(t.Item.Name, name) {
+		if isMatchingID(t.Name, name) {
 			return i, nil
 		}
 	}

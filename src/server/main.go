@@ -17,7 +17,7 @@ func main() {
 
 	// Solves Cross Origin Access Issue
 	c := cors.New(cors.Options{
-		AllowedOrigins: []string{"http://localhost:4200"},
+		AllowedOrigins: []string{"http://localhost:2200"},
 	})
 	handler := c.Handler(r)
 
