@@ -6,39 +6,11 @@ import {
   MatTreeFlattener
 } from '@angular/material/tree';
 import { BehaviorSubject } from 'rxjs';
-import { TreeItemFlatNode } from 'src/models/tree-node-flat';
-import { TreeItemNode } from 'src/models/tree-node';
-import { TreeNodeDto } from 'src/models/tree-node.dto';
-import { TreeService } from 'src/services/tree.service';
+import { TreeItemFlatNode } from 'src/app/models/tree-node-flat';
+import { TreeItemNode } from 'src/app/models/tree-node';
+import { TreeNodeDto } from 'src/app/models/tree-node.dto';
+import { TreeService } from 'src/app/services/tree.service';
 
-/**
- * The Json object for to-do list data.
- */
-const TREE_DATA = [
-  {
-    id: 0,
-    income: 212,
-    outcome: 112,
-    name: 'Income',
-    children: [
-      {
-        id: 1,
-        income: 0,
-        outcome: 20,
-        name: 'Almond Meal flour',
-        children: null
-      },
-      { id: 2, income: 0, outcome: 30, name: 'Organic eggs', children: null },
-      { id: 3, income: 0, outcome: 10, name: 'Protein Powder', children: null }
-    ]
-  }
-];
-
-/**
- * Checklist database, it can build a tree structured Json object.
- * Each node in Json object represents a to-do item or a category.
- * If a node is a category, it has children items and new items can be added under the category.
- */
 @Injectable()
 export class ChecklistDatabase {
   dataChange = new BehaviorSubject<TreeItemNode[]>([]);
@@ -169,8 +141,7 @@ export class TreeListComponent {
 
   hasChild = (_: number, nodeData: TreeItemFlatNode) => nodeData.expandable;
 
-  hasNoContent = (_: number, nodeData: TreeItemFlatNode) =>
-    nodeData.name === '';
+  hasNoContent = (_: number, nodeData: TreeItemFlatNode) => nodeData.name === '';
 
   /**
    * Transformer to convert nested node to flat node. Record the nodes in maps for later use.

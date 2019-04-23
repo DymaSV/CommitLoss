@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { TreeNodeDto } from 'src/models/tree-node.dto';
+import { TreeNodeDto } from 'src/app/models/tree-node.dto';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({

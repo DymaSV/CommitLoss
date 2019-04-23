@@ -6,6 +6,7 @@ import { TreeListComponent } from './tree-list';
 import { MaterialModule } from './material-module';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { TreeService } from './services/tree.service';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,7 @@ import { HttpClientModule } from '@angular/common/http';
     MaterialModule,
     AppRoutingModule
   ],
-  providers: [],
+  providers: [TreeService],
   bootstrap: [TreeListComponent]
 })
 export class AppModule { }
