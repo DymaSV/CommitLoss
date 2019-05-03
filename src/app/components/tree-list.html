@@ -1,3 +1,11 @@
+<form class="form">
+  <mat-form-field class="commitValue">
+    <input matInput type="text" placeholder="Set value" name="value" ngModel>
+    <button mat-button *ngIf="value" matSuffix mat-icon-button aria-label="Clear" (click)="value=''">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+</form>
 <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
   <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding>
     <button mat-icon-button disabled></button>
@@ -5,8 +13,8 @@
                   [checked]="checklistSelection.isSelected(node)"
                   (change)="todoLeafItemSelectionToggle(node)">
                   {{node.name}}
-                  <button mat-mini-fab class="comes" color="primary">{{node.income}}</button>
-                  <button mat-mini-fab class="comes" color="warn">{{node.outcome}}</button>
+                  <button mat-button class="comes_green">{{node.income}}</button>
+                  <button mat-button class="comes_red">{{node.outcome}}</button>
                 </mat-checkbox>
   </mat-tree-node>
 
@@ -28,6 +36,8 @@
     <mat-checkbox [checked]="descendantsAllSelected(node)"
                   [indeterminate]="descendantsPartiallySelected(node)"
                   (change)="todoItemSelectionToggle(node)">{{node.name}}</mat-checkbox>
+                  <button mat-button class="comes_green">{{node.income}}</button>
+                  <button mat-button class="comes_red">{{node.outcome}}</button>
     <button mat-icon-button (click)="addNewItem(node)"><mat-icon>add</mat-icon></button>
   </mat-tree-node>
 </mat-tree>

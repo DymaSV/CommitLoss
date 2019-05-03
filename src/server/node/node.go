@@ -23,7 +23,7 @@ func initialiseList() {
 		Income:  212,
 		Outcome: 112,
 		Children: []Node{Node{ID: 1, Income: 0, Outcome: 20, Name: "Almond Meal flour", Children: nil},
-			Node{ID: 2, Income: 2, Outcome: 220, Name: "Protein Powder", Children: nil}},
+			Node{ID: 2, Income: 2, Outcome: 2230, Name: "Protein Powder", Children: nil}},
 	}
 	Add(item)
 }

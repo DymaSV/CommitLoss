@@ -14,7 +14,7 @@ import { TreeService } from 'src/app/services/tree.service';
 @Injectable()
 export class ChecklistDatabase {
   dataChange = new BehaviorSubject<TreeItemNode[]>([]);
-  maxId = 0;
+  maxItemNodeId = 0;
   get data(): TreeItemNode[] {
     return this.dataChange.value;
   }
@@ -42,8 +42,8 @@ export class ChecklistDatabase {
       node.name = value.name;
       node.income = value.income;
       node.outcome = value.outcome;
-      if (this.maxId < value.id) {
-        this.maxId = value.id;
+      if (this.maxItemNodeId < value.id) {
+        this.maxItemNodeId = value.id;
       }
       if (value != null) {
         if (typeof value === 'object' && value.children !== null) {
@@ -61,8 +61,8 @@ export class ChecklistDatabase {
   insertItem(parent: TreeItemNode, nodeName: string) {
     if (parent.children) {
       const newItem = new TreeItemNode();
-      newItem.id = this.maxId;
-      this.maxId++;
+      newItem.id = this.maxItemNodeId;
+      this.maxItemNodeId++;
       newItem.name = nodeName;
       newItem.income = 0;
       newItem.outcome = 0;
@@ -89,6 +89,7 @@ export class ChecklistDatabase {
   providers: [ChecklistDatabase]
 })
 export class TreeListComponent {
+  protected value: string;
   /** Map from flat node to nested node. This helps us finding the nested node to be modified */
   flatNodeMap = new Map<TreeItemFlatNode, TreeItemNode>();
 
@@ -141,7 +142,8 @@ export class TreeListComponent {
 
   hasChild = (_: number, nodeData: TreeItemFlatNode) => nodeData.expandable;
 
-  hasNoContent = (_: number, nodeData: TreeItemFlatNode) => nodeData.name === '';
+  hasNoContent = (_: number, nodeData: TreeItemFlatNode) =>
+    nodeData.name === '';
 
   /**
    * Transformer to convert nested node to flat node. Record the nodes in maps for later use.
@@ -154,6 +156,8 @@ export class TreeListComponent {
         : new TreeItemFlatNode();
     flatNode.id = node.id;
     flatNode.name = node.name;
+    flatNode.income = node.income;
+    flatNode.outcome = node.outcome;
     flatNode.level = level;
     flatNode.expandable = !!node.children;
     this.flatNodeMap.set(flatNode, node);
