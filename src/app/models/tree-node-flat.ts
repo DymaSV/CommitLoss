@@ -2,6 +2,7 @@
 export class TreeItemFlatNode {
   id: number;
   name: string;
+  alias: string;
   level: number;
   income: number;
   outcome: number;

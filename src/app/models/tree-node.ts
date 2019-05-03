@@ -7,4 +7,5 @@ export class TreeItemNode {
     income: number;
     outcome: number;
     name: string;
+    alias: string;
   }

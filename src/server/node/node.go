@@ -20,10 +20,11 @@ func initialiseList() {
 	item := Node{
 		ID:      0,
 		Name:    "Income",
+		Alias:    "inco",
 		Income:  212,
 		Outcome: 112,
-		Children: []Node{Node{ID: 1, Income: 0, Outcome: 20, Name: "Almond Meal flour", Children: nil},
-			Node{ID: 2, Income: 2, Outcome: 2230, Name: "Protein Powder", Children: nil}},
+		Children: []Node{Node{ID: 1, Income: 0, Outcome: 20, Name: "Almond Meal flour", Alias: "amfl", Children: nil},
+			Node{ID: 2, Income: 2, Outcome: 2230, Name: "Protein Powder", Alias: "ppow", Children: nil}},
 	}
 	Add(item)
 }
@@ -32,6 +33,7 @@ func initialiseList() {
 type Node struct {
 	ID       int    `json:"id"`
 	Name     string `json:"name"`
+	Alias    string `json:"alias"`
 	Income   int    `json:"income"`
 	Outcome  int    `json:"outcome"`
 	Children []Node `json:"children"`

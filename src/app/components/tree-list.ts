@@ -10,6 +10,7 @@ import { TreeItemFlatNode } from 'src/app/models/tree-node-flat';
 import { TreeItemNode } from 'src/app/models/tree-node';
 import { TreeNodeDto } from 'src/app/models/tree-node.dto';
 import { TreeService } from 'src/app/services/tree.service';
+import { ParserTranslator } from '../translators/parser.translator';
 
 @Injectable()
 export class ChecklistDatabase {
@@ -40,6 +41,7 @@ export class ChecklistDatabase {
       const node = new TreeItemNode();
       node.id = value.id;
       node.name = value.name;
+      node.alias = value.alias;
       node.income = value.income;
       node.outcome = value.outcome;
       if (this.maxItemNodeId < value.id) {
@@ -64,6 +66,7 @@ export class ChecklistDatabase {
       newItem.id = this.maxItemNodeId;
       this.maxItemNodeId++;
       newItem.name = nodeName;
+      newItem.alias = this.createAlias(newItem.name);
       newItem.income = 0;
       newItem.outcome = 0;
       newItem.children = null;
@@ -72,8 +75,13 @@ export class ChecklistDatabase {
     }
   }
 
+  createAlias(name: string): string {
+    return null;
+  }
+
   updateItem(node: TreeItemNode, nodeName: string) {
     node.name = nodeName;
+    node.alias = this.createAlias(node.name);
     this.dataChange.next(this.data);
   }
 }
@@ -96,6 +104,9 @@ export class TreeListComponent {
   /** Map from nested node to flattened node. This helps us to keep the same object for selection */
   nestedNodeMap = new Map<TreeItemNode, TreeItemFlatNode>();
 
+  /** Map from alias to flattened node. This helps us object by alias */
+  aliasNodeMap = new Map<string, TreeItemFlatNode>();
+
   /** A selected parent node to be inserted */
   selectedParent: TreeItemFlatNode | null = null;
 
@@ -113,7 +124,10 @@ export class TreeListComponent {
     true /* multiple */
   );
 
-  constructor(private database: ChecklistDatabase) {
+  constructor(
+    private database: ChecklistDatabase,
+    private translator: ParserTranslator
+  ) {
     this.treeFlattener = new MatTreeFlattener(
       this.transformer,
       this.getLevel,
@@ -156,14 +170,16 @@ export class TreeListComponent {
         : new TreeItemFlatNode();
     flatNode.id = node.id;
     flatNode.name = node.name;
+    flatNode.alias = node.alias;
     flatNode.income = node.income;
     flatNode.outcome = node.outcome;
     flatNode.level = level;
     flatNode.expandable = !!node.children;
     this.flatNodeMap.set(flatNode, node);
     this.nestedNodeMap.set(node, flatNode);
+    this.aliasNodeMap.set(flatNode.alias, flatNode);
     return flatNode;
-  }
+  };
 
   /** Whether all the descendants of the node are selected. */
   descendantsAllSelected(node: TreeItemFlatNode): boolean {
@@ -200,6 +216,16 @@ export class TreeListComponent {
   todoLeafItemSelectionToggle(node: TreeItemFlatNode): void {
     this.checklistSelection.toggle(node);
     this.checkAllParentsSelection(node);
+    this.setValue();
+  }
+
+  setValue() {
+    this.value =
+      this.checklistSelection.selected.length > 0
+        ? Object.values(this.checklistSelection.selected)
+            .map(item => item.alias)
+            .join(';')
+        : null;
   }
 
   /* Checks all the parents when a leaf node is selected/unselected */
@@ -258,5 +284,9 @@ export class TreeListComponent {
     const nestedNode = this.flatNodeMap.get(node);
     // tslint:disable-next-line:no-non-null-assertion
     this.database.updateItem(nestedNode!, itemValue);
+  }
+
+  pressEnter() {
+    this.translator.parseValue(this.value);
   }
 }
