@@ -287,6 +287,19 @@ export class TreeListComponent {
   }
 
   pressEnter() {
-    this.translator.parseValue(this.value);
+    let array = this.translator.parseValue(this.value);
+    array.forEach(item => {
+      let node = this.aliasNodeMap.get(item.alias);
+      if (item.sign === '-') {
+        node.outcome -= +item.num;
+      } else if (item.sign === '+') {
+        node.income += +item.num;
+      }
+      this.checklistSelection.deselect(node);
+    });
+  }
+
+  clearValue() {
+    this.value = '';
   }
 }

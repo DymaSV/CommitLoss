@@ -1,7 +1,7 @@
 <form class="form">
   <mat-form-field class="commitValue">
-    <input matInput type="text" placeholder="Set value" name="value" [(ngModel)]="value" (keyup.enter)="pressEnter()">
-    <button mat-button *ngIf="value" matSuffix mat-icon-button aria-label="Clear" (click)="value=''">
+    <input matInput type="text" placeholder="Set value" name="value" [(ngModel)]="value" (keydown.enter)="pressEnter()">
+    <button mat-button *ngIf="value" matSuffix mat-icon-button aria-label="Clear" (click)="clearValue()">
       <mat-icon>close</mat-icon>
     </button>
   </mat-form-field>
