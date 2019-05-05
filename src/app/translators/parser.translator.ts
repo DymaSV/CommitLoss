@@ -7,7 +7,7 @@ export class ParserTranslator {
   public parseValue(
     value: string
   ): { alias: string; num: number; sign: string }[] {
-    let resArray: { alias: string; num: number; sign: string }[] = [];
+    const resArray: { alias: string; num: number; sign: string }[] = [];
     const splitted = value.split(';');
     splitted.forEach(element => {
       const regExpStr = /[a-z]{4}/g;

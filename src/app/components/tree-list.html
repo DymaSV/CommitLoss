@@ -5,6 +5,7 @@
       <mat-icon>close</mat-icon>
     </button>
   </mat-form-field>
+<button mat-button class="comes_blue" (click)="commitValue()">Commit</button>
 </form>
 <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
   <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding>

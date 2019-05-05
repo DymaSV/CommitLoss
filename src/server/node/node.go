@@ -20,7 +20,7 @@ func initialiseList() {
 	item := Node{
 		ID:      0,
 		Name:    "Income",
-		Alias:    "inco",
+		Alias:   "inco",
 		Income:  212,
 		Outcome: 112,
 		Children: []Node{Node{ID: 1, Income: 0, Outcome: 20, Name: "Almond Meal flour", Alias: "amfl", Children: nil},
@@ -42,6 +42,15 @@ type Node struct {
 // Get list of nodes
 func Get() []Node {
 	return list
+}
+
+// Add new node
+func RecreateList(item Node) error {
+	mtx.Lock()
+	list = []Node{}
+	list = append(list, item)
+	mtx.Unlock()
+	return nil
 }
 
 // Add new node

@@ -5,4 +5,5 @@ export class TreeNodeDto {
     income: number;
     outcome: number;
     name: string;
+    alias: string;
   }

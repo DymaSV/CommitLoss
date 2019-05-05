@@ -11,6 +11,7 @@ import { TreeItemNode } from 'src/app/models/tree-node';
 import { TreeNodeDto } from 'src/app/models/tree-node.dto';
 import { TreeService } from 'src/app/services/tree.service';
 import { ParserTranslator } from '../translators/parser.translator';
+import { TreeNodeTranslator } from '../translators/tree-node.translator';
 
 @Injectable()
 export class ChecklistDatabase {
@@ -20,12 +21,15 @@ export class ChecklistDatabase {
     return this.dataChange.value;
   }
 
-  constructor(private treeSrvice: TreeService) {
+  constructor(
+    private treeSrvice: TreeService,
+    private nodeTraslator: TreeNodeTranslator
+  ) {
     this.initialize();
   }
 
   initialize() {
-    this.treeSrvice.Get().subscribe(s => {
+    this.treeSrvice.getNodes().subscribe(s => {
       const data = this.buildFileTree(s, 0);
       this.dataChange.next(data);
     });
@@ -83,6 +87,12 @@ export class ChecklistDatabase {
     node.name = nodeName;
     node.alias = this.createAlias(node.name);
     this.dataChange.next(this.data);
+  }
+
+  saveValues() {
+    this.treeSrvice.saveChangedValues(
+      this.nodeTraslator.itemNodeToDto(this.dataChange.value[0])
+    ).subscribe();
   }
 }
 
@@ -157,6 +167,7 @@ export class TreeListComponent {
   hasChild = (_: number, nodeData: TreeItemFlatNode) => nodeData.expandable;
 
   hasNoContent = (_: number, nodeData: TreeItemFlatNode) =>
+    // tslint:disable-next-line:semicolon
     nodeData.name === '';
 
   /**
@@ -179,6 +190,7 @@ export class TreeListComponent {
     this.nestedNodeMap.set(node, flatNode);
     this.aliasNodeMap.set(flatNode.alias, flatNode);
     return flatNode;
+  // tslint:disable-next-line:semicolon
   };
 
   /** Whether all the descendants of the node are selected. */
@@ -220,6 +232,7 @@ export class TreeListComponent {
   }
 
   setValue() {
+    this.value = null;
     this.value =
       this.checklistSelection.selected.length > 0
         ? Object.values(this.checklistSelection.selected)
@@ -287,19 +300,26 @@ export class TreeListComponent {
   }
 
   pressEnter() {
-    let array = this.translator.parseValue(this.value);
+    const array = this.translator.parseValue(this.value);
     array.forEach(item => {
-      let node = this.aliasNodeMap.get(item.alias);
+      const nodeFlat = this.aliasNodeMap.get(item.alias);
+      const node = this.flatNodeMap.get(nodeFlat);
       if (item.sign === '-') {
-        node.outcome -= +item.num;
+        nodeFlat.outcome += +item.num;
+        node.outcome += +item.num;
       } else if (item.sign === '+') {
+        nodeFlat.income += +item.num;
         node.income += +item.num;
       }
-      this.checklistSelection.deselect(node);
+      this.checklistSelection.deselect(nodeFlat);
     });
   }
 
   clearValue() {
     this.value = '';
+  }
+
+  commitValue() {
+    this.database.saveValues();
   }
 }

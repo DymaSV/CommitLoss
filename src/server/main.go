@@ -13,7 +13,8 @@ import (
 func main() {
 	r := gin.Default()
 
-	r.GET("/node", handlers.GetNodeListHandler)
+	r.GET("/nodes", handlers.GetNodeListHandler)
+	r.POST("/save", handlers.AddNodeHandler)
 
 	// Solves Cross Origin Access Issue
 	c := cors.New(cors.Options{

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -22,7 +23,8 @@ func AddNodeHandler(c *gin.Context) {
 		c.JSON(statusCode, err)
 		return
 	}
-	errAdd := node.Add(nodeItem)
+	fmt.Println(nodeItem)
+	errAdd := node.RecreateList(nodeItem)
 	if errAdd == nil {
 		c.JSON(statusCode, nodeItem)
 	} else {
