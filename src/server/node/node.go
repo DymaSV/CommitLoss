@@ -18,19 +18,21 @@ func init() {
 func initialiseList() {
 	list = []Node{}
 	item := Node{
-		ID:      0,
-		Name:    "Income",
-		Alias:   "inco",
-		Income:  212,
-		Outcome: 112,
-		Children: []Node{Node{ID: 1, Income: 0, Outcome: 20, Name: "Almond Meal flour", Alias: "amfl", Children: nil},
-			Node{ID: 2, Income: 2, Outcome: 2230, Name: "Protein Powder", Alias: "ppow", Children: nil}},
+		ParentID: -1,
+		ID:       0,
+		Name:     "Income",
+		Alias:    "inco",
+		Income:   212,
+		Outcome:  112,
+		Children: []Node{Node{ParentID: 0, ID: 1, Income: 0, Outcome: 20, Name: "Almond Meal flour", Alias: "amfl", Children: nil},
+			Node{ParentID: 0, ID: 2, Income: 2, Outcome: 2230, Name: "Protein Powder", Alias: "ppow", Children: nil}},
 	}
-	Add(item)
+	list = append(list, item)
 }
 
 // Node structur
 type Node struct {
+	ParentID int    `json:"parentID"`
 	ID       int    `json:"id"`
 	Name     string `json:"name"`
 	Alias    string `json:"alias"`
@@ -54,11 +56,22 @@ func RecreateList(item Node) error {
 }
 
 // Add new node
-func Add(item Node) error {
+func Add(item Node) ([]Node, error) {
 	mtx.Lock()
-	list = append(list, item)
+	if item.ParentID >= 0 {
+		for _, node := range list {
+			if node.ID == item.ParentID {
+				if node.Children == nil {
+					node.Children = []Node{}
+				}
+				node.Children = append(node.Children, item)
+			}
+		}
+	} else {
+		list = append(list, item)
+	}
 	mtx.Unlock()
-	return nil
+	return list, nil
 }
 
 // Delete Node from list
