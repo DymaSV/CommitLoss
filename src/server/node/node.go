@@ -54,19 +54,25 @@ func RecreateList(item Node) error {
 	mtx.Unlock()
 	return nil
 }
+func addItemToChild(array []Node, item Node) {
+	for i := 0; i < len(array); i++ {
+		if array[i].ID == item.ParentID {
+			if array[i].Children == nil {
+				array[i].Children = []Node{}
+			}
+			array[i].Children = append(array[i].Children, item)
+		}
+		if array[i].Children != nil {
+			addItemToChild(array[i].Children, item)
+		}
+	}
+}
 
 // Add new node
 func Add(item Node) ([]Node, error) {
 	mtx.Lock()
 	if item.ParentID >= 0 {
-		for _, node := range list {
-			if node.ID == item.ParentID {
-				if node.Children == nil {
-					node.Children = []Node{}
-				}
-				node.Children = append(node.Children, item)
-			}
-		}
+		addItemToChild(list, item)
 	} else {
 		list = append(list, item)
 	}
