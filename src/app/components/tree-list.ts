@@ -369,7 +369,9 @@ export class TreeListComponent {
     const array = this.translator.parseValue(this.value);
     array.forEach(item => {
       const nodeFlat = this.aliasNodeMap.get(item.alias);
+      console.log(nodeFlat);
       const node = this.flatNodeMap.get(nodeFlat);
+      console.log(node);
       if (item.sign === '-') {
         nodeFlat.outcome += +item.num;
         node.outcome += +item.num;
