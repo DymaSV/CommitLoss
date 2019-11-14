@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { TreeNodeDto } from 'src/app/models/tree-node.dto';
 import { HttpClient } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
@@ -15,6 +15,7 @@ const httpOptions = {
 export class TreeService {
   getNodesUrl = 'http://localhost:2201/nodes';
   postChangesUrl = 'http://localhost:2201/save';
+  getAliasUrl = 'http://localhost:2201/getAlias';
   constructor(private http: HttpClient) {}
 
   public getNodes(): Observable<TreeNodeDto[]> {
@@ -23,5 +24,13 @@ export class TreeService {
 
   public saveChangedValues(node: TreeNodeDto): Observable<any> {
     return this.http.post(this.postChangesUrl, node, httpOptions);
+  }
+
+  public getAlias(alias: string): Observable<string> {
+    return this.http.post<string>(this.getAliasUrl, alias, httpOptions);
+  }
+
+  public getAliasTest(alias: string): Observable<string> {
+    return of('1111');
   }
 }

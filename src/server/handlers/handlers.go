@@ -6,7 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"../node"
+	"go-project/CommitLoss/src/server/node"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -32,8 +33,8 @@ func AddNodeHandler(c *gin.Context) {
 
 // DeleteItemHandler will delete a specified node based on user http input
 func DeleteItemHandler(c *gin.Context) {
-	nodeName := c.Param("name")
-	if err := node.Delete(nodeName); err != nil {
+	alias := c.Param("alias")
+	if err := node.Delete(alias); err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}

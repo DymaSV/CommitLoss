@@ -1,7 +1,7 @@
 package node
 
 import (
-	"errors"
+	"fmt"
 	"sync"
 )
 
@@ -46,7 +46,7 @@ func Get() []Node {
 	return list
 }
 
-// Add new node
+// RecreateList reload list with first item
 func RecreateList(item Node) error {
 	mtx.Lock()
 	list = []Node{}
@@ -54,6 +54,7 @@ func RecreateList(item Node) error {
 	mtx.Unlock()
 	return nil
 }
+
 func addItemToChild(array []Node, item Node) {
 	for i := 0; i < len(array); i++ {
 		if array[i].ID == item.ParentID {
@@ -81,33 +82,26 @@ func Add(item Node) ([]Node, error) {
 }
 
 // Delete Node from list
-func Delete(name string) error {
-	id, err := findTodoLocation(name)
-	if err != nil {
-		return err
-	}
-	if id == -1 {
-		return errors.New("There is no such of name")
-	}
-	removeElementByName(id)
+func Delete(alias string) error {
+	removeElementByAlias(alias, &list)
+	fmt.Println(list)
 	return nil
 }
 
-func findTodoLocation(name string) (int, error) {
+func removeElementByAlias(alias string, nodes *[]Node) {
 	mtx.RLock()
+	list := *nodes
 	defer mtx.RUnlock()
 	for i, t := range list {
-		if isMatchingID(t.Name, name) {
-			return i, nil
+		if isMatchingID(t.Alias, alias) {
+			list = append(list[:i], list[i+1:]...)
+			fmt.Println(list)
+			return
+		} else if t.Children != nil {
+			removeElementByAlias(alias, &t.Children)
+			fmt.Println(t.Children)
 		}
 	}
-	return -1, errors.New("could not find node based on name")
-}
-
-func removeElementByName(i int) {
-	mtx.Lock()
-	list = append(list[:i], list[i+1:]...)
-	mtx.Unlock()
 }
 
 func isMatchingID(a string, b string) bool {

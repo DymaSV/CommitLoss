@@ -1,11 +1,11 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { FlatTreeControl } from '@angular/cdk/tree';
-import { Component, Injectable } from '@angular/core';
+import { Component, Injectable, ElementRef, ViewChild } from '@angular/core';
 import {
   MatTreeFlatDataSource,
   MatTreeFlattener
 } from '@angular/material/tree';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { TreeItemFlatNode } from 'src/app/models/tree-node-flat';
 import { TreeItemNode } from 'src/app/models/tree-node';
 import { TreeNodeDto } from 'src/app/models/tree-node.dto';
@@ -80,7 +80,69 @@ export class ChecklistDatabase {
   }
 
   createAlias(name: string): string {
+    if (name) {
+      const nameArr = name
+        .toLowerCase()
+        .trim()
+        .split(' ');
+      let alias = '';
+      const i = 0;
+      if (nameArr && nameArr.length > 0) {
+        // tslint:disable-next-line:prefer-for-of
+        if (nameArr.length === 1 && nameArr[0].length < 3) {
+          alias = nameArr[0];
+        } else {
+          alias = this.createNameForAlias(nameArr, alias, i);
+        }
+      }
+      alias += i;
+      return this.changeNameIfExist(alias);
+    }
     return null;
+  }
+
+  private createNameForAlias(nameArr: string[], alias: string, i: number) {
+    // tslint:disable-next-line:prefer-for-of
+    for (let index = 0; index < nameArr.length; index++) {
+      alias += nameArr[index][i];
+      if (alias.length === 3) {
+        return alias;
+      }
+    }
+    return this.createNameForAlias(nameArr, alias, ++i);
+  }
+
+  changeNameIfExist(alias: string): string {
+    if (this.isAliasExist(alias, this.data)) {
+      return this.changeNameIfExist(this.changeName(alias));
+    }
+    return alias;
+  }
+  isAliasExist(alias: string, nodes: TreeItemNode[]): boolean {
+    // tslint:disable-next-line:prefer-for-of
+    for (let index = 0; index < nodes.length; index++) {
+      // console.log(`${nodes[index].alias} -> ${alias} = ${nodes[index].alias === alias}`);
+      if (nodes[index].alias === alias) {
+        return true;
+      } else {
+        if (nodes[index].children && nodes[index].children.length > 0) {
+          return this.isAliasExist(alias, nodes[index].children);
+        }
+      }
+    }
+    return false;
+  }
+
+  changeName(alias: string): string {
+    const r = /\d+/;
+    const numStr = alias.match(r);
+    console.log(`${numStr}`);
+    alias = alias.substr(0, alias.length - numStr.length);
+    console.log(`${alias}`);
+    let num = +numStr;
+    num++;
+    alias = alias + num.toString();
+    return alias;
   }
 
   updateItem(node: TreeItemNode, nodeName: string) {
@@ -90,9 +152,11 @@ export class ChecklistDatabase {
   }
 
   saveValues() {
-    this.treeSrvice.saveChangedValues(
-      this.nodeTraslator.itemNodeToDto(this.dataChange.value[0])
-    ).subscribe();
+    this.treeSrvice
+      .saveChangedValues(
+        this.nodeTraslator.itemNodeToDto(this.dataChange.value[0])
+      )
+      .subscribe();
   }
 }
 
@@ -107,6 +171,7 @@ export class ChecklistDatabase {
   providers: [ChecklistDatabase]
 })
 export class TreeListComponent {
+  @ViewChild('matInput') matInput: ElementRef;
   protected value: string;
   /** Map from flat node to nested node. This helps us finding the nested node to be modified */
   flatNodeMap = new Map<TreeItemFlatNode, TreeItemNode>();
@@ -190,7 +255,7 @@ export class TreeListComponent {
     this.nestedNodeMap.set(node, flatNode);
     this.aliasNodeMap.set(flatNode.alias, flatNode);
     return flatNode;
-  // tslint:disable-next-line:semicolon
+    // tslint:disable-next-line:semicolon
   };
 
   /** Whether all the descendants of the node are selected. */
@@ -239,6 +304,7 @@ export class TreeListComponent {
             .map(item => item.alias)
             .join(';')
         : null;
+    this.matInput.nativeElement.focus();
   }
 
   /* Checks all the parents when a leaf node is selected/unselected */
